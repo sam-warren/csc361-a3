@@ -64,7 +64,6 @@ class TCP_Header:
         num4 = buffer[1] & 15
         port = num1 + num2 + num3 + num4
         self.src_port_set(port)
-        # print(self.src_port)
         return None
 
     def get_dst_port(self, buffer):
@@ -74,13 +73,11 @@ class TCP_Header:
         num4 = buffer[1] & 15
         port = num1 + num2 + num3 + num4
         self.dst_port_set(port)
-        # print(self.dst_port)
         return None
 
     def get_seq_num(self, buffer):
         seq = struct.unpack(">I", buffer)[0]
         self.seq_num_set(seq)
-        # print(seq)
         return None
 
     def get_ack_num(self, buffer):
@@ -107,14 +104,12 @@ class TCP_Header:
         value = struct.unpack("B", buffer)[0]
         length = ((value & 240) >> 4) * 4
         self.data_offset_set(length)
-        # print(self.data_offset)
         return None
 
     def relative_seq_num(self, orig_num):
         if self.seq_num >= orig_num:
             relative_seq = self.seq_num - orig_num
             self.seq_num_set(relative_seq)
-        # print(self.seq_num)
 
     def relative_ack_num(self, orig_num):
         if self.ack_num >= orig_num:
@@ -405,8 +400,6 @@ with open(sys.argv[1], "rb") as f:
 
             if p.IP_header.protocol == 17:
                 p.IP_header.get_udp_src_port(packet_data[34:36])
-                # print("UDP SRC PORT: ", p.IP_header.udp_src_port)
-                # print()
                 udp_packets.append(p)
 
     intermediate_nodes = []
@@ -418,9 +411,6 @@ with open(sys.argv[1], "rb") as f:
     dst_found = False
     src_node = None
     dest_node = None
-
-    print("UDP: ", len(udp_packets))
-    print("ICMP: ", len(icmp_packets))
 
     for udp_packet in udp_packets:
         for icmp_packet in icmp_packets:
@@ -459,36 +449,8 @@ with open(sys.argv[1], "rb") as f:
                     found = True
                     fragment["num_frags"] += 1
                     fragment["offset"] = udp_packet.IP_header.fragment_offset
-        # if udp_packet.IP_header.flags["MF"] == False and :
-    x = 0
 
-    print("SOURCE NODE: ")
-    print("\tSRC IP: ", src_node.IP_header.src_ip)
-    print("\tDST IP: ", src_node.IP_header.dst_ip)
-    print("\tSRC PORT: ", src_node.IP_header.udp_src_port)
-    print("\tTIMESTAMP: ", src_node.timestamp)
-
-    print("DEST NODE: ")
-    print("\tSRC IP: ", dest_node.IP_header.src_ip)
-    print("\tDST IP: ", dest_node.IP_header.dst_ip)
-    print("\tSRC PORT: ", dest_node.IP_header.udp_src_port)
-    print("\tTIMESTAMP: ", dest_node.timestamp)
     for pair in pairs:
-        x += 1
-        print("Pair " + str(x) + ": ")
-        print("TTL: ", pair[2])
-        print("\tUDP: ")
-        print("\t\tSRC IP: ", pair[0].IP_header.src_ip)
-        print("\t\tDST IP: ", pair[0].IP_header.dst_ip)
-        print("\t\tSRC PORT: ", pair[0].IP_header.udp_src_port)
-        print("\t\tTIMESTAMP: ", pair[0].timestamp)
-        print("\tICMP: ")
-        print("\t\tSRC IP: ", pair[1].IP_header.src_ip)
-        print("\t\tDST IP: ", pair[1].IP_header.dst_ip)
-        print("\t\tSRC PORT: ", pair[1].IP_header.icmp_src_port)
-        print("\t\tTIMESTAMP: ", pair[1].timestamp)
-        print("-------------------------------------------")
-
         if pair[1].IP_header.src_ip not in intermediate_nodes and pair[1].IP_header.src_ip != dest_node.IP_header.dst_ip:
             intermediate_nodes.append(pair[1])
 
